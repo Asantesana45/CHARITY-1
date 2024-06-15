@@ -16,7 +16,7 @@ export default () => {
 				name="profile"
 				options={{
 					tabBarLabel: 'Account',
-					headerTitle: 'My Account',
+					
 					tabBarIcon: ({ color, size }) => <FontAwesome5 name="user" size={size} color={color} />
 				}}
 			/>
@@ -48,7 +48,7 @@ export default () => {
 <Tabs.Screen
 	name="CharitiesScreen"
 	options={{
-		tabBarLabel: 'List of Charities',
+		tabBarLabel: 'List of Campaigns',
 		headerShown: false,
 		tabBarIcon: ({ color, size }) => <FontAwesome5 name="list-alt" size={size} color={color} />
 	}}

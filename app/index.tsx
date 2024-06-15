@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
 import { initializeApp } from '@firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from '@firebase/auth';
-import { router } from 'expo-router';
-
+import { useRouter } from 'expo-router';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCHGQDQ7IBjfVcZ88fECCnsFaYoMEyeQXM",
@@ -24,6 +23,8 @@ const LoginPage = () => {
   const [isLogin, setIsLogin] = useState(true);
 
   const auth = getAuth(app);
+  const router = useRouter();
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
@@ -31,12 +32,6 @@ const LoginPage = () => {
 
     return () => unsubscribe();
   }, [auth]);
-
-
-  const handleNavigationToHome = () => {
-    router.replace('/app/home');
-  };
-
 
   const handleAuthentication = async () => {
     try {
@@ -61,6 +56,17 @@ const LoginPage = () => {
     }
   };
 
+  const handleNavigationToHome = () => {
+    router.replace('/app/home');
+  };
+
+  const handleNavigationToProfile = () => {
+    router.push({
+      pathname: './app/profile',
+      params: { email: user?.email }
+    });
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {user ? (
@@ -73,6 +79,10 @@ const LoginPage = () => {
           <View style={styles.buttonGap} />
 
           <Button title="Navigate to Home Page" onPress={handleNavigationToHome} color="#3498db" />
+
+          <View style={styles.buttonGap} />
+
+          <Button title="Navigate to Profile Page" onPress={handleNavigationToProfile} color="#3498db" />
         </View>
       ) : (
         // Show sign-in or sign-up form if user is not authenticated
@@ -95,7 +105,6 @@ const LoginPage = () => {
           />
           <View style={styles.buttonContainer}>
             <Button title={isLogin ? 'Sign In' : 'Sign Up'} onPress={handleAuthentication} color="#3498db" />
-            
           </View>
 
           <View style={styles.bottomContainer}>
@@ -111,51 +120,48 @@ const LoginPage = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 20,
   },
   authContainer: {
-    width: '80%',
-    maxWidth: 400,
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 8,
-    elevation: 3,
+    width: '100%', // Make the auth container take full width
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
-    marginBottom: 16,
-    textAlign: 'center',
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  emailText: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 10,
+  },
+  buttonGap: {
+    height: 25,
   },
   input: {
-    height: 40,
-    borderColor: '#ddd',
+    width: '100%',
+    padding: 15,
+    marginBottom: 15,
     borderWidth: 1,
-    marginBottom: 16,
-    padding: 8,
-    borderRadius: 4,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    fontSize: 16, // Increased font size for better readability
   },
   buttonContainer: {
-    marginBottom: 16,
+    width: '80%',
+    marginBottom: 10,
+  },
+  bottomContainer: {
+    marginTop: 20,
   },
   toggleText: {
     color: '#3498db',
     textAlign: 'center',
   },
-  bottomContainer: {
-    marginTop: 20,
-  },
-  emailText: {
-    fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  buttonGap: {
-    marginBottom: 10, // Adjust the gap between the buttons
-  }
 });
 
 export default LoginPage;

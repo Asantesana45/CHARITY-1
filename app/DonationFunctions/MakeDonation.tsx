@@ -17,9 +17,7 @@ const MakeDonation = ({ campaignId }: MakeDonationProps) => {
   const paymentGateways = ['M-Pesa', 'Tigo Pesa', 'Airtel Money', 'Visa'];
 
   const handleAmountChange = (text: string) => {
-    // Check if the entered value is a valid number
     if (!/^\d+$/.test(text)) {
-      // If it is not a valid number, display an error message and change the border color of the input field to red
       Alert.alert('Please enter a valid amount');
       setAmount('');
       setInputBorderColor('red');
@@ -29,14 +27,38 @@ const MakeDonation = ({ campaignId }: MakeDonationProps) => {
     }
   };
 
-  const handlePaymentGatewayChange = (gateway: string) => {
+  const handlePaymentGatewayChange = async (gateway: string) => {
     setPaymentGateway(gateway);
+    if (gateway === 'M-Pesa') {
+      try {
+        const response = await fetch('http://localhost:3000/donate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            campaignId,
+            amount,
+            fullName,
+            email,
+            phoneNumber,
+            paymentGateway: gateway,
+          }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          Alert.alert('Payment Successful', `Transaction ID: ${data.transactionId}`);
+        } else {
+          Alert.alert('Payment Failed', data.message);
+        }
+      } catch (error) {
+        Alert.alert('Payment Error', error.message);
+      }
+    }
   };
 
   const handleFullNameChange = (text: string) => {
-    // Check if the entered value contains only letters and spaces
     if (!/^[a-zA-Z\s]+$/.test(text)) {
-      // If it is not valid, display an error message and change the border color of the input field to red
       Alert.alert('Please enter a valid full name');
       setFullName('');
       setInputBorderColor('red');
@@ -51,9 +73,7 @@ const MakeDonation = ({ campaignId }: MakeDonationProps) => {
   };
 
   const handlePhoneNumberChange = (text: string) => {
-    // Check if the entered value is a valid phone number
     if (!/^[0-9]+$/.test(text)) {
-      // If it is not a valid phone number, display an error message and change the border color of the input field to red
       Alert.alert('Please enter a valid phone number');
       setPhoneNumber('');
       setInputBorderColor('red');
@@ -61,12 +81,6 @@ const MakeDonation = ({ campaignId }: MakeDonationProps) => {
       setPhoneNumber(text);
       setInputBorderColor('black');
     }
-  };
-
-  const handleMakePayment = () => {
-    // Call payment gateway API to make payment
-    console.log(`Making payment of ${amount} TSH to campaign ${campaignId} via ${paymentGateway}`);
-    //...
   };
 
   return (
@@ -112,7 +126,7 @@ const MakeDonation = ({ campaignId }: MakeDonationProps) => {
         value={phoneNumber}
         onChangeText={handlePhoneNumberChange}
       />
-      <TouchableOpacity style={styles.makePaymentButton} onPress={handleMakePayment}>
+      <TouchableOpacity style={styles.makePaymentButton} onPress={() => handlePaymentGatewayChange(paymentGateway)}>
         <Text style={styles.makePaymentText}>Make Payment</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -129,11 +143,11 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16
+    marginBottom: 16,
   },
   campaignName: {
     fontSize: 16,
-    marginBottom: 16
+    marginBottom: 16,
   },
   input: {
     height: 48,
@@ -141,52 +155,53 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 12,
-    marginBottom: 16
+    marginBottom: 16,
   },
   predefinedAmountsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 24 // Increased spacing between predefined amounts
+    marginBottom: 24, // Increased spacing between predefined amounts
   },
   predefinedAmountButton: {
     backgroundColor: '#007bff',
     paddingVertical: 12,
     paddingHorizontal: 3,
-    borderRadius: 8
+    borderRadius: 8,
   },
   predefinedAmountText: {
     color: 'white',
-    fontSize: 16
+    fontSize: 16,
   },
   paymentGatewayLabel: {
     fontSize: 16,
-    marginBottom: 8
+    marginBottom: 8,
   },
   paymentGatewaysContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 24 // Increased spacing between payment gateways
+    marginBottom: 24, // Increased spacing between payment gateways
   },
   paymentGatewayButton: {
     backgroundColor: '#007bff',
     paddingVertical: 12,
     paddingHorizontal: 5,
-    borderRadius: 15
+    borderRadius: 15,
   },
   paymentGatewayText: {
     color: 'white',
-    fontSize: 16
+    fontSize: 16,
   },
   makePaymentButton: {
     backgroundColor: '#007bff',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   makePaymentText: {
     color: 'white',
-    fontSize: 16
-  }
+    fontSize: 16,
+  },
 });
+
 export default MakeDonation;
