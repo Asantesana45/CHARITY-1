@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { initializeApp } from '@firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from '@firebase/auth';
 import { useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCHGQDQ7IBjfVcZ88fECCnsFaYoMEyeQXM",
@@ -21,6 +22,8 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null); // Track user authentication state
   const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false); // Track password visibility
+  const [errorMessage, setErrorMessage] = useState(''); // Track error message
 
   const auth = getAuth(app);
   const router = useRouter();
@@ -53,6 +56,8 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.error('Authentication error:', error.message);
+      setErrorMessage('Incorrect email or password, try again..');
+      setTimeout(() => setErrorMessage(''), 3000); // Clear error message after 3 seconds
     }
   };
 
@@ -96,13 +101,19 @@ const LoginPage = () => {
             placeholder="Email"
             autoCapitalize="none"
           />
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Password"
-            secureTextEntry
-          />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.passwordInput}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Password"
+              secureTextEntry={!showPassword}
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+              <MaterialIcons name={showPassword ? "visibility" : "visibility-off"} size={24} color="gray" />
+            </TouchableOpacity>
+          </View>
+          {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
           <View style={styles.buttonContainer}>
             <Button title={isLogin ? 'Sign In' : 'Sign Up'} onPress={handleAuthentication} color="#3498db" />
           </View>
@@ -120,10 +131,10 @@ const LoginPage = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    padding: 20,
   },
   authContainer: {
     width: '100%', // Make the auth container take full width
@@ -151,6 +162,24 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     fontSize: 16, // Increased font size for better readability
   },
+  passwordContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginBottom: 15,
+    paddingRight: 10,
+  },
+  passwordInput: {
+    flex: 1,
+    padding: 15,
+    fontSize: 16, // Increased font size for better readability
+  },
+  eyeIcon: {
+    padding: 10,
+  },
   buttonContainer: {
     width: '80%',
     marginBottom: 10,
@@ -161,6 +190,10 @@ const styles = StyleSheet.create({
   toggleText: {
     color: '#3498db',
     textAlign: 'center',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 15,
   },
 });
 

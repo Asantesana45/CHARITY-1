@@ -8,7 +8,7 @@ export default () => {
 				name="home"
 				options={{
 					tabBarLabel: 'Home',
-					headerTitle: 'Home Screen',
+					headerTitle: 'HOME',
 					tabBarIcon: ({ color, size }) => <FontAwesome5 name="home" size={size} color={color} />
 				}}
 			/>
@@ -16,7 +16,7 @@ export default () => {
 				name="profile"
 				options={{
 					tabBarLabel: 'Account',
-					
+					headerTitle: 'Profile',
 					tabBarIcon: ({ color, size }) => <FontAwesome5 name="user" size={size} color={color} />
 				}}
 			/>
